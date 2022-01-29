@@ -20,8 +20,8 @@ namespace Notification_Forwarder
         public App()
         {
             this.InitializeComponent();
-            this.Suspending += OnSuspending;
-            this.Resuming += OnResuming;
+            //this.Suspending += OnSuspending;
+            //this.Resuming += OnResuming;
             Debug.AutoFlush = true;
         }
 

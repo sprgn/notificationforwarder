@@ -10,6 +10,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media.Animation;
+using Windows.ApplicationModel.ExtendedExecution.Foreground;
 
 namespace Notification_Forwarder
 {
@@ -28,6 +29,7 @@ namespace Notification_Forwarder
         public static List<Protocol.Notification> UnsentNotificationPool = new List<Protocol.Notification>();
         public static Thread UploadWorkerThread;
         public static bool IsUploadWorkerActive => UploadWorkerThread?.IsAlive == true;
+        public static ExtendedExecutionForegroundSession newSession = null;
 
         private string GetString(string key)
         {
@@ -122,7 +124,26 @@ namespace Notification_Forwarder
                         Notifications.AddRange(initialList);
                         Listener.NotificationChanged += NotificationHandler;
                         Conf.Log("notification listener activated.", LogLevel.Complete);
-                        StartUploadWorker();
+
+                        newSession = new ExtendedExecutionForegroundSession();
+                        newSession.Reason = ExtendedExecutionForegroundReason.Unconstrained;
+                        newSession.Description = "Long Running Processing";
+                        //newSession.Revoked += SessionRevoked;
+                        ExtendedExecutionForegroundResult result = await newSession.RequestExtensionAsync();
+                        switch (result)
+                        {
+                            case ExtendedExecutionForegroundResult.Allowed:
+                                Conf.Log("Creating extended session.", LogLevel.Info);
+                                StartUploadWorker();
+                                break;
+
+                            default:
+                            case ExtendedExecutionForegroundResult.Denied:
+                                Conf.Log("Not able to start extended session.", LogLevel.Error);
+                                await NoPermissionDialog();
+                                break;
+                        }
+                        
                         break;
                     default:
                         Conf.Log("permission not granted, no exceptions thrown.", LogLevel.Warning);
@@ -132,7 +153,7 @@ namespace Notification_Forwarder
             }
             catch (Exception ex)
             {
-                Conf.Log($"notification listener failed: {ex.Message}, HRESULT 0x{ex.HResult:x}", LogLevel.Error);
+                Conf.Log($"mainpage notification listener failed: {ex.Message}, HRESULT 0x{ex.HResult:x}", LogLevel.Error);
                 await NoPermissionDialog(ex.Message);
             }
             Navigation.SelectedItem = HomePageItem;
