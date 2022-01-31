@@ -16,43 +16,57 @@ namespace Notification_Forwarder
             if (e.ChangeKind != UserNotificationChangedKind.Added) return;
             try
             {
-                var item = Listener.GetNotification(e.UserNotificationId);
-                Notifications.Add(item);
-                //x var notifsNew = await Listener.GetNotificationsAsync(NotificationKinds.Toast);
-                //lock (UnsentNotificationPool)
-                //{
-                //x lock (notifs)
-                //x {
-                //x notifs = notifsNew;
-                //x var newlyAdded = notifs.Except(Notifications, new NotificationComparer()).ToList();
-                //x Conf.Log($"received {newlyAdded.Count} notification(s) from listener");
-                //x  NewNotificationPool.AddRange(newlyAdded);
-                //x Conf.Log($"added to NewNotificationPool");
-                //x Notifications.AddRange(newlyAdded);
-                //x Conf.Log($"added to Notifications");
-                //x foreach (var item in newlyAdded)
-                //x {
-
-                Conf.CurrentConf.AddApp(new AppInfo(item.AppInfo) { ForwardingEnabled = !Conf.CurrentConf.MuteNewApps });
-                var appIndex = Conf.CurrentConf.FindAppIndex(new AppInfo(item.AppInfo));
-                //x if (appIndex == -1 && !Conf.CurrentConf.MuteNewApps) continue;
-                //x if (!Conf.CurrentConf.AppsToForward[appIndex].ForwardingEnabled) continue;
-
-                if (appIndex > -1 && Conf.CurrentConf.AppsToForward[appIndex].ForwardingEnabled)
+                Conf.Log($"triggered notification #{e.UserNotificationId}");
+                UserNotification item = null;
+                for(int i = 0; item == null && i < 5; i++)
                 {
-                    Conf.Log($"marked notification #{item.Id} as pending, app: {item.AppInfo.AppUserModelId}");
-                    //UnsentNotificationPool.Add(new Protocol.Notification(item));
-                    ForwardNotification(new Protocol.Notification(item));
-                    Conf.Log($"added notification #{item.Id}");
+                    item = Listener.GetNotification(e.UserNotificationId);
                 }
-                
-                //x }
-                //x         Conf.CurrentConf.NotificationsReceived += newlyAdded.Count;
-                            Conf.CurrentConf.NotificationsReceived += 1;
-                //x Conf.Log($"notifications received #{newlyAdded.Count}");
-                //x notifs = new List<UserNotification>();
-                //x }
-                //}
+
+                if (item != null)
+                {
+                    Conf.Log($"extracted notification #{item.Id}");
+                    Notifications.Add(item);
+                    //x var notifsNew = await Listener.GetNotificationsAsync(NotificationKinds.Toast);
+                    //lock (UnsentNotificationPool)
+                    //{
+                    //x lock (notifs)
+                    //x {
+                    //x notifs = notifsNew;
+                    //x var newlyAdded = notifs.Except(Notifications, new NotificationComparer()).ToList();
+                    //x Conf.Log($"received {newlyAdded.Count} notification(s) from listener");
+                    //x  NewNotificationPool.AddRange(newlyAdded);
+                    //x Conf.Log($"added to NewNotificationPool");
+                    //x Notifications.AddRange(newlyAdded);
+                    //x Conf.Log($"added to Notifications");
+                    //x foreach (var item in newlyAdded)
+                    //x {
+
+                    Conf.CurrentConf.AddApp(new AppInfo(item.AppInfo) { ForwardingEnabled = !Conf.CurrentConf.MuteNewApps });
+                    var appIndex = Conf.CurrentConf.FindAppIndex(new AppInfo(item.AppInfo));
+                    //x if (appIndex == -1 && !Conf.CurrentConf.MuteNewApps) continue;
+                    //x if (!Conf.CurrentConf.AppsToForward[appIndex].ForwardingEnabled) continue;
+
+                    if (appIndex > -1 && Conf.CurrentConf.AppsToForward[appIndex].ForwardingEnabled)
+                    {
+                        Conf.Log($"marked notification #{item.Id} as pending, app: {item.AppInfo.AppUserModelId}");
+                        //UnsentNotificationPool.Add(new Protocol.Notification(item));
+                        ForwardNotification(new Protocol.Notification(item));
+                        Conf.Log($"forwarded notification #{item.Id}");
+                    }
+
+                    //x }
+                    //x         Conf.CurrentConf.NotificationsReceived += newlyAdded.Count;
+                    Conf.CurrentConf.NotificationsReceived += 1;
+                    //x Conf.Log($"notifications received #{newlyAdded.Count}");
+                    //x notifs = new List<UserNotification>();
+                    //x }
+                    //}
+                }
+                else
+                {
+                    Conf.Log($"notifications not available: {e.UserNotificationId}", LogLevel.Error);
+                }
             }
             catch (Exception ex)
             {
