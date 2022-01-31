@@ -10,12 +10,11 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media.Animation;
-using Windows.ApplicationModel.ExtendedExecution.Foreground;
 
 namespace Notification_Forwarder
 {
     /// <summary>
-    /// 可用于自身或导航至 Frame 内部的空白页。
+    /// Can be used on itself or to navigate to a blank page inside the Frame.
     /// </summary>
     public sealed partial class MainPage : Page
     {
@@ -29,7 +28,6 @@ namespace Notification_Forwarder
         public static List<Protocol.Notification> UnsentNotificationPool = new List<Protocol.Notification>();
         public static Thread UploadWorkerThread;
         public static bool IsUploadWorkerActive => UploadWorkerThread?.IsAlive == true;
-        public static ExtendedExecutionForegroundSession newSession = null;
 
         private string GetString(string key)
         {
@@ -117,6 +115,10 @@ namespace Notification_Forwarder
                         IsPermissionGranted = true;
                         var initialList = await Listener.GetNotificationsAsync(NotificationKinds.Toast);
                         Conf.Log($"loading {initialList.Count} notification(s)...");
+
+                        //var history = Windows.UI.Notifications.ToastNotificationManager.History;
+
+
                         foreach (var notif in initialList)
                         {
                             Conf.CurrentConf.AddApp(new AppInfo(notif.AppInfo) {ForwardingEnabled = !Conf.CurrentConf.MuteNewApps});
@@ -124,26 +126,7 @@ namespace Notification_Forwarder
                         Notifications.AddRange(initialList);
                         Listener.NotificationChanged += NotificationHandler;
                         Conf.Log("notification listener activated.", LogLevel.Complete);
-
-                        newSession = new ExtendedExecutionForegroundSession();
-                        newSession.Reason = ExtendedExecutionForegroundReason.Unconstrained;
-                        newSession.Description = "Long Running Processing";
-                        //newSession.Revoked += SessionRevoked;
-                        ExtendedExecutionForegroundResult result = await newSession.RequestExtensionAsync();
-                        switch (result)
-                        {
-                            case ExtendedExecutionForegroundResult.Allowed:
-                                Conf.Log("Creating extended session.", LogLevel.Info);
-                                StartUploadWorker();
-                                break;
-
-                            default:
-                            case ExtendedExecutionForegroundResult.Denied:
-                                Conf.Log("Not able to start extended session.", LogLevel.Error);
-                                await NoPermissionDialog();
-                                break;
-                        }
-                        
+                        StartUploadWorker();                        
                         break;
                     default:
                         Conf.Log("permission not granted, no exceptions thrown.", LogLevel.Warning);

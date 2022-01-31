@@ -11,19 +11,22 @@ namespace Notification_Forwarder.Protocol
         public string TimeStamp;
         public string Title;
         public string Content;
+        public uint MessageId;
 
         public Notification() { }
-        public Notification(AppInfo app, string timeStamp, string title, string content)
+        public Notification(AppInfo app, string timeStamp, string title, string content, uint id)
         {
             App = app;
             TimeStamp = timeStamp;
             Title = title;
             Content = content;
+            MessageId = id;
         }
         public Notification(UserNotification source)
         {
             App = new AppInfo(source.AppInfo);
             TimeStamp = source.CreationTime.DateTime.ToString("o");
+            MessageId = source.Id;
             var toastBinding = source.Notification.Visual.GetBinding(KnownNotificationBindings.ToastGeneric);
             if (toastBinding != null)
             {
