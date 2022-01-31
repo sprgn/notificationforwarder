@@ -32,11 +32,11 @@ namespace Notification_Forwarder
         private void OnResuming(object sender, object e)
         {
             Conf.Log("RESUME TRIGGERED");
-            if (!MainPage.IsUploadWorkerActive)
-            {
-                Conf.Log("app resumed, restoring upload worker...");
-                MainPage.StartUploadWorker();
-            }
+            //if (!MainPage.IsUploadWorkerActive)
+            //{
+            //    Conf.Log("app resumed, restoring upload worker...");
+            //    //MainPage.StartUploadWorker();
+            //}
         }
 
         /// <summary>

@@ -17,5 +17,10 @@
             UseProxy = false;
             Proxy = new ProxyInfo();
         }
+
+        public override string ToString()
+        {
+            return "{Address: \"" + Address + "\", UseHttpAuth: " + UseHttpAuth;
+        }
     }
 }

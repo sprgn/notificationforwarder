@@ -11,7 +11,7 @@
   <Identity
     Name="32615Elepover.NotificationForwarder"
     Publisher="CN=testalert"
-    Version="1.3.38.0" />
+    Version="1.4.3.0" />
 
   <mp:PhoneIdentity PhoneProductId="0318cd22-d177-4614-b6de-243a5d11f676" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 

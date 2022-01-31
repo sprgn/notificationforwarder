@@ -10,6 +10,11 @@ namespace Notification_Forwarder.Protocol
 {
     public partial class ClientData
     {
+        public static void Send(ApiEndPoint endPoint, Notification notification)
+        {
+            ClientData.Send(endPoint, new ClientData(new[] { notification }), notification.MessageId.ToString());
+        }
+
         public static void Send(ApiEndPoint endPoint, ClientData clientData, string session)
         {
             try

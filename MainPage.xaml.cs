@@ -24,10 +24,10 @@ namespace Notification_Forwarder
         public static bool IsListenerActive { get; set; } = false;
         public static bool IsPermissionGranted { get; private set; } = false;
         public static List<UserNotification> Notifications = new List<UserNotification>();
-        public static List<UserNotification> NewNotificationPool = new List<UserNotification>();
-        public static List<Protocol.Notification> UnsentNotificationPool = new List<Protocol.Notification>();
-        public static Thread UploadWorkerThread;
-        public static bool IsUploadWorkerActive => UploadWorkerThread?.IsAlive == true;
+        //x public static List<UserNotification> NewNotificationPool = new List<UserNotification>();
+        //public static List<Protocol.Notification> UnsentNotificationPool = new List<Protocol.Notification>();
+        //public static Thread UploadWorkerThread;
+//        public static bool IsUploadWorkerActive => UploadWorkerThread?.IsAlive == true;
 
         private string GetString(string key)
         {
@@ -123,10 +123,10 @@ namespace Notification_Forwarder
                         {
                             Conf.CurrentConf.AddApp(new AppInfo(notif.AppInfo) {ForwardingEnabled = !Conf.CurrentConf.MuteNewApps});
                         }
-                        Notifications.AddRange(initialList);
+                        //x Notifications.AddRange(initialList);
                         Listener.NotificationChanged += NotificationHandler;
                         Conf.Log("notification listener activated.", LogLevel.Complete);
-                        StartUploadWorker();                        
+                        //startuploadworker();
                         break;
                     default:
                         Conf.Log("permission not granted, no exceptions thrown.", LogLevel.Warning);

@@ -52,16 +52,16 @@ namespace Notification_Forwarder.Pages
                             TextBlock_NoNotificationsAvailable.Visibility = Visibility.Visible;
                             ListView_Notifications.Visibility = Visibility.Collapsed;
                         }
-                        else
-                        {
-                            TextBlock_NoNotificationsAvailable.Visibility = Visibility.Collapsed;
-                            ListView_Notifications.Visibility = Visibility.Visible;
-                            lock (MainPage.NewNotificationPool)
-                            {
-                                LoadNotifications(MainPage.NewNotificationPool);
-                                MainPage.NewNotificationPool.Clear();
-                            }
-                        }
+                        //else
+                        //{
+                         //   TextBlock_NoNotificationsAvailable.Visibility = Visibility.Collapsed;
+                        //    ListView_Notifications.Visibility = Visibility.Visible;
+                            //lock (MainPage.NewNotificationPool)
+                            //{
+                            //    LoadNotifications(MainPage.NewNotificationPool);
+                            //    MainPage.NewNotificationPool.Clear();
+                            //}
+                       // }
                     });
                 }
                 catch
